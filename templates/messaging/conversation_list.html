@@ -1,0 +1,21 @@
+<!-- templates/messaging/conversation_list.html -->
+
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Conversations</h2>
+    <ul class="list-group">
+        {% for conversation in conversations %}
+        <li class="list-group-item">
+            <a href="{% url 'conversation_detail' pk=conversation.pk %}">
+                Conversation {{ conversation.pk }}
+                <!-- Optional: Display participants or last message preview -->
+            </a>
+        </li>
+        {% empty %}
+        <li class="list-group-item">You have no conversations.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

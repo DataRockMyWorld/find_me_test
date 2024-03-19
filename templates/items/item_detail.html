@@ -1,0 +1,18 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ item.title }}</h5>
+            <p class="card-text">{{ item.description }}</p>
+            {% if not item.claimant %}
+                <a href="{% url 'make_claim' item.id %}" class="btn btn-primary">Claim</a>
+                <a href="{% url 'claim_create' item.id %}" class="btn btn-info">Claim this Item</a>
+            {% else %}
+                <button class="btn btn-secondary" disabled>Already Claimed</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2 class="mb-4">My Dashboard</h2>
+
+    <div class="row">
+        <!-- My Items Section -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3>My Items</h3>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for item in user_items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ item.title }}
+                        <span>
+                            <a href="{% url 'edit_item' item.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'item-delete' item.id %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            {% for claim in item.claims.all %}
+                                <a href="{% url 'message_user' claim.claimant.id %}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            {% endfor %}
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No items listed yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Incoming Claims Section -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3>Incoming Claims</h3>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for claim in user_claims %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Claim on {{ claim.item.title }} by {{ claim.claimant }}
+                        <span>
+                            <a href="{% url 'approve_claim' claim.id %}" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <a href="{% url 'reject_claim' claim.id %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-times"></i>
+                            </a>
+                            <a href="{% url 'message_user' claim.item.owner.id %}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-envelope"></i> Message
+                            </a>
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No incoming claims.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Messaging & Claim History Section -->
+        <div class="col-lg-4 col-md-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h3>Messages & History</h3>
+                </div>
+                <div class="card-body">
+                    <p>Check your latest conversations and manage claim history.</p>
+                    <a href="{% url 'conversation_list' %}" class="btn btn-outline-primary btn-block mb-3">
+                        <i class="fas fa-envelope"></i> View Messages
+                    </a>
+                    <a href="{% url 'claim_history' %}" class="btn btn-outline-secondary btn-block">
+                        <i class="fas fa-history"></i> View Claim History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

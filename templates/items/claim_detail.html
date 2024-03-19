@@ -1,0 +1,12 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2>Claim Detail</h2>
+    <p><strong>Item:</strong> {{ claim.item.title }}</p>
+    <p><strong>Claimed by:</strong> {{ claim.claimer.username }}</p>
+    <p><strong>Description:</strong> {{ claim.claim_description }}</p>
+    <p><strong>Status:</strong> {{ claim.status }}</p>
+    <!-- Add more details as needed -->
+</div>
+{% endblock %}

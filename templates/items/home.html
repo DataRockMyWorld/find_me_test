@@ -1,0 +1,27 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="get" action=".">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search items" name="q" value="{{ request.GET.q }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+    <div class="btn-group mb-3" role="group" aria-label="Basic example">
+        <a href="{% url 'lost_items' %}" class="btn btn-primary">Lost Items</a>
+        <a href="{% url 'found_items' %}" class="btn btn-secondary">Found Items</a>
+    </div>
+    {% if items %}
+        <ul class="list-group">
+            {% for item in items %}
+                <li class="list-group-item">
+                    <a href="{% url 'item_detail' item.id %}">{{ item.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

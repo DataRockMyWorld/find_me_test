@@ -1,0 +1,43 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Your Items</h2>
+    <div class="text-right mb-3">
+        <a href="{% url 'item-create' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Add New Item
+        </a>
+    </div>
+    {% if items %}
+        <div class="row">
+            {% for item in items %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.title }}</h5>
+                        <p class="card-text">{{ item.description|truncatewords:20 }}</p>
+                        <div class="text-right">
+                            <a href="{% url 'item-update' item.id %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{% url 'item-delete' item.id %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            You currently have no items listed. Add a new item to get started.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+{% endblock %}
+

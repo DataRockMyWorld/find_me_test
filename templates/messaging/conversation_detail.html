@@ -1,0 +1,26 @@
+<!-- templates/messaging/conversation_detail.html -->
+
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Conversation {{ conversation.pk }}</h2>
+    <div class="messages">
+        {% for message in conversation.messages.all %}
+        <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+            <p>{{ message.sender.username }}: {{ message.content }}</p>
+        </div>
+        {% empty %}
+        <p>No messages.</p>
+        {% endfor %}
+    </div>
+    <form method="post" action="{% url 'send_message' %}">
+        {% csrf_token %}
+        <input type="hidden" name="conversation_id" value="{{ conversation.pk }}">
+        <div class="form-group">
+            <textarea name="content" class="form-control" placeholder="Type your message here..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+</div>
+{% endblock %}
