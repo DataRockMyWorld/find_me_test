@@ -15,5 +15,6 @@ class SignUpForm(UserCreationForm):
         user = super().save(commit=False)
         if commit:
             user.save()
-            UserProfile.objects.create(user=user, address=self.cleaned_data['address'], phone_number=self.cleaned_data['phone_number'])
+            UserProfile.objects.get_or_create(user=user, defaults={'address': self.cleaned_data['address'],     'phone_number': self.cleaned_data['phone_number']})
         return user
+

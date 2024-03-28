@@ -4,7 +4,7 @@ from .models import Claim
 class ClaimForm(forms.ModelForm):
     class Meta:
         model = Claim
-        fields = ['description', 'lost_location', 'last_seen']
+        fields = ['description', 'lost_location']
         widgets = {
             'last_seen': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }

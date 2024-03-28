@@ -1,0 +1,65 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="jumbotron text-center bg-info text-white">
+  <div class="container-fluid">
+    <h1 class="jumbotron-heading">Welcome to Find Me!</h1>
+    <p class="lead">A community-driven platform to help you find lost items or report found ones. Start your search or help someone in your community today.</p>
+    <p>
+      <a href="{% url 'item-list' %}" class="btn btn-primary my-2">Explore Items</a>
+      <a href="{% url 'signup' %}" class="btn btn-secondary my-2">Sign Up</a>
+    </p>
+  </div>
+</section>
+
+<!-- Features Section -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Lost Something?</h5>
+          <p class="card-text">Report lost items easily and let the community help you find them.</p>
+          <a href="{% url 'item-create' %}" class="btn btn-outline-info">Report Lost Item</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Found Something?</h5>
+          <p class="card-text">Help return items back to their owners by reporting found items.</p>
+          <a href="{% url 'item-create' %}" class="btn btn-outline-info">Report Found Item</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Join Our Community</h5>
+          <p class="card-text">Sign up today and be part of a community that helps each other.</p>
+          <a href="{% url 'signup' %}" class="btn btn-outline-info">Sign Up Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Testimonials Section -->
+<section class="text-center my-5">
+  <div class="container">
+    <h2 class="mb-5">Hear from Our Users</h2>
+    <!-- Add testimonials here -->
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="text-white bg-info py-5">
+  <div class="container text-center">
+    <h2>Ready to find or report an item?</h2>
+    <p>Join us now and make a difference in your community.</p>
+    <a href="{% url 'signup' %}" class="btn btn-lg btn-light">Sign Up</a>
+  </div>
+</section>
+{% endblock %}

@@ -23,18 +23,21 @@ class ConversationManager(models.Manager):
             conversation = self.model()
             conversation.save()
             conversation.participants.add(user1, user2)
+            created = True
+        else:
+            created = False
+            
 
-        return conversation
+        return conversation, created
 
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="conversations")
 
-    # Attach the custom manager
     objects = ConversationManager()
 
     def __str__(self):
-        return f"Conversation {self.id}"
+        return f"Conversation between {', '.join(self.participants.values_list('username', flat=True))}"
 
 
 
@@ -45,5 +48,5 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Message from {self.sender} to {self.receiver} on {self.timestamp}"
+        return f"Message from {self.sender.username} on {self.timestamp}"
 

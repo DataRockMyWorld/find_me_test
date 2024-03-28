@@ -1,21 +1,23 @@
-<!-- templates/messaging/conversation_list.html -->
-
 {% extends '../base.html' %}
 
 {% block content %}
-<div class="container">
-    <h2>Conversations</h2>
-    <ul class="list-group">
+<div class="container mt-4">
+    <h2 class="mb-3">Conversations</h2>
+    <div class="list-group">
         {% for conversation in conversations %}
-        <li class="list-group-item">
-            <a href="{% url 'conversation_detail' pk=conversation.pk %}">
-                Conversation {{ conversation.pk }}
-                <!-- Optional: Display participants or last message preview -->
-            </a>
-        </li>
+        <a href="{% url 'conversation_detail' pk=conversation.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Conversation {{ conversation.pk }}</h5>
+                <!-- Example: Show the number of messages or participants -->
+                <small>{{ conversation.messages.count }} messages</small>
+            </div>
+            <!-- Example: Show last message preview -->
+            <p class="mb-1 text-muted">{{ conversation.messages.last.content|truncatewords:10 }}</p>
+        </a>
         {% empty %}
-        <li class="list-group-item">You have no conversations.</li>
+        <div class="list-group-item">You have no conversations.</div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 {% endblock %}
+

@@ -22,7 +22,7 @@ class Item(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='items')
     date_posted = models.DateTimeField(default=timezone.now)
     image = models.ImageField(upload_to='item_images/', blank=True)
-    
+    location = models.CharField(max_length=255, blank=True)
     
     def has_pending_claims(self):
         return self.claims.filter(status='pending').exists()

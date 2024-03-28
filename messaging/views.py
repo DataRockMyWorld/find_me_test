@@ -20,7 +20,7 @@ class ConversationListView(LoginRequiredMixin, ListView):
     template_name = 'messaging/conversation_list.html'
 
     def get_queryset(self):
-        return Conversation.objects.filter(participants=self.request.user).distinct()
+        return self.request.user.conversations.all().distinct()
 
 class ConversationDetailView(LoginRequiredMixin, DetailView):
     model = Conversation
@@ -29,30 +29,19 @@ class ConversationDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         # Ensure the user is a participant of the conversation
-        return Conversation.objects.filter(participants=self.request.user)
+        return self.request.user.conversations.all()
     
 
 class SendMessageView(CreateView):
     model = Message
-    fields = ['content', 'conversation']  # Assuming you have a way for the user to choose the conversation
+    fields = ['content']
     template_name = 'messaging/send_message.html'
 
     def form_valid(self, form):
-        # Assume the conversation is correctly set in the form.
-        # Now, set the sender and determine the receiver based on the conversation's participants.
-        conversation = form.cleaned_data.get('conversation')
         form.instance.sender = self.request.user
-
-        # Logic to determine the receiver within the conversation
-        # This is a simplistic approach for two-person conversations.
-        other_participants = conversation.participants.exclude(id=self.request.user.id)
-        if other_participants.exists():
-            form.instance.receiver = other_participants.first()
-        else:
-            # Handle error or invalid conversation scenario
-            pass
-
+        form.instance.conversation_id = self.kwargs.get('conv_id')
         return super().form_valid(form)
+    
 
     def get_success_url(self):
         # Redirect to the conversation detail page or another success page
@@ -61,14 +50,12 @@ class SendMessageView(CreateView):
 
 @login_required
 def message_user(request, user_id):
-    recipient = get_object_or_404(get_user_model(), id=user_id)
-    
-    # Prevent users from messaging themselves
-    if recipient == request.user:
+    other_user = get_object_or_404(get_user_model(), id=user_id)
+    if request.user == other_user:
         messages.error(request, "You cannot create a conversation with yourself.")
-        return redirect('dashboard')  # Redirect to an appropriate view
-
-    conversation = Conversation.objects.get_or_create_between(request.user, recipient)
+        return redirect('dashboard')
     
-    # Redirect to the conversation detail view or a message creation view
+    # Try to get an existing conversation or create a new one if it doesn't exist
+    conversation, created = Conversation.objects.get_or_create_between(request.user, other_user)
     return redirect('conversation_detail', pk=conversation.pk)
+

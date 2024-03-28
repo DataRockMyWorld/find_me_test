@@ -1,18 +1,16 @@
-<!-- templates/messaging/send_message.html -->
-
 {% extends '../base.html' %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-4">
     <h2>Send a Message</h2>
-    <form method="post">
+    <form method="post" action=".">
         {% csrf_token %}
-        <input type="hidden" name="conversation_id" value="{{ conversation.pk }}">
         <div class="form-group">
-            <label for="content">Message:</label>
-            <textarea id="content" name="content" class="form-control" required></textarea>
+            <label for="content" class="form-label">Message:</label>
+            <textarea id="content" name="content" class="form-control" rows="3" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Send</button>
     </form>
 </div>
 {% endblock %}
+

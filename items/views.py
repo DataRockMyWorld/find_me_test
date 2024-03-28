@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
 from .models import Item, Category, Notification
 from claims.models import Claim
-from .forms import ItemForm
+from .forms import ItemForm, ItemSearchForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -18,7 +18,34 @@ class ItemListView(LoginRequiredMixin, ListView):
     template_name = 'items/item_list.html'
 
     def get_queryset(self):
-        return Item.objects.filter(owner=self.request.user)
+        # Start with all items or limit to the user's items based on your needs
+        items = Item.objects.all()  # or .filter(owner=self.request.user) for user's items
+
+        # Instantiate the search form with GET data
+        self.form = ItemSearchForm(self.request.GET)
+
+        if self.form.is_valid():
+            if query := self.form.cleaned_data.get('query'):
+                items = items.filter(title__icontains=query)
+            if category := self.form.cleaned_data.get('category'):
+                items = items.filter(category=category)
+            if status := self.form.cleaned_data.get('status'):
+                items = items.filter(status=status)
+            if location := self.form.cleaned_data.get('location'):
+                items = items.filter(location__icontains=location)
+            if sort_by := self.form.cleaned_data.get('sort_by'):
+                if sort_by == 'newest':
+                    items = items.order_by('-date_posted')
+                elif sort_by == 'oldest':
+                    items = items.order_by('date_posted')
+
+        return items
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add the form to the context
+        context['form'] = self.form
+        return context
 
 class ItemCreateView(LoginRequiredMixin, CreateView):
     model = Item
@@ -183,12 +210,19 @@ class ClaimCreateView(LoginRequiredMixin, View):
 
     def post(self, request, item_id):
         item = get_object_or_404(Item, pk=item_id)
+        existing_claim = Claim.objects.filter(item=item, claimant=request.user).exists()
+        if existing_claim:
+            messages.error(request, "You have already made a claim on this item.")
+            return redirect('item_detail', id=item_id)
+            
+        
         form = ClaimForm(request.POST)
         if form.is_valid():
             claim = form.save(commit=False)
             claim.item = item
-            claim.claimer = request.user  # Assuming you have a claimer field to store who made the claim
+            claim.claimant = request.user  # Assuming you have a claimer field to store who made the claim
             claim.save()
+            messages.success(request, "Your claim has been submitted successfully.")
             # Redirect to a confirmation page, item detail, or dashboard
             return redirect('dashboard')
         return render(request, 'items/claim_form.html', {'form': form, 'item': item})
@@ -197,3 +231,7 @@ class ClaimCreateView(LoginRequiredMixin, View):
 def claim_detail_view(request, claim_id):
     claim = get_object_or_404(Claim, pk=claim_id)
     return render(request, 'items/claim_detail.html', {'claim': claim})
+
+
+def index(request):
+    return render(request, 'items/index.html')

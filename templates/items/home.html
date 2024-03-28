@@ -1,27 +1,76 @@
 {% extends '../base.html' %}
 
 {% block content %}
+
 <div class="container mt-5">
-    <form method="get" action=".">
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Search items" name="q" value="{{ request.GET.q }}">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="submit">Search</button>
+    <h1>Welcome to Find Me!</h1>
+    <p class="lead">Your one-stop solution for finding lost items or reporting found ones.</p>
+    
+    <!-- Other homepage content -->
+
+    <!-- Link to Item List for Advanced Search -->
+    <div class="mt-4">
+        <a href="{% url 'item-list' %}" class="btn btn-info">Explore Advanced Search Options</a>
+    </div>
+</div>
+
+<div class="container mt-5">
+<!--
+     <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
+    <div class="col-md-6 px-0">
+      <h1 class="display-4 fst-italic">Welcome to Find Me</h1>
+      <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
+      <p class="lead mb-0"><a href="#" class="text-white fw-bold">Continue reading...</a></p>
+    </div>
+    -->
+  </div>
+    <!-- Enhanced Search Form -->
+    <main class="container">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <form method="get" action=".">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Search items, e.g., 'wallet', 'phone'" name="q" value="{{ request.GET.q }}" aria-label="Search items">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-info" type="submit"><i class="fas fa-search"></i> Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Buttons for Lost and Found Items -->
+    <div class="text-center mb-5">
+        <a href="{% url 'lost_items' %}" class="btn btn-primary mr-2">Lost Items</a>
+        <a href="{% url 'found_items' %}" class="btn btn-secondary ml-2">Found Items</a>
+    </div>
+    
+    <!-- Cards for Item Listings -->
+    {% if items %}
+    <div class="row">
+        {% for item in items %}
+        <div class="col-sm-12 col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'item_detail' item.id %}" class="stretched-link">{{ item.title }}</a></h5>
+                    <p class="card-text">{{ item.description|truncatewords:20 }}</p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Category: {{ item.category }}</small>
+                </div>
             </div>
         </div>
-    </form>
-    <div class="btn-group mb-3" role="group" aria-label="Basic example">
-        <a href="{% url 'lost_items' %}" class="btn btn-primary">Lost Items</a>
-        <a href="{% url 'found_items' %}" class="btn btn-secondary">Found Items</a>
+        {% endfor %}
     </div>
-    {% if items %}
-        <ul class="list-group">
-            {% for item in items %}
-                <li class="list-group-item">
-                    <a href="{% url 'item_detail' item.id %}">{{ item.title }}</a>
-                </li>
-            {% endfor %}
-        </ul>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        No items found. Try adjusting your search or check out lost and found items.
+    </div>
     {% endif %}
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+{% endblock %}
+
