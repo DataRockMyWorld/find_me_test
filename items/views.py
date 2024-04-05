@@ -119,7 +119,8 @@ def edit_item(request, item_id):
         form = ItemForm(request.POST, request.FILES, instance=item)
         if form.is_valid():
             form.save()
-            return redirect('items/item_detail', id=item.id)
+            print("Item saved successfully")
+            return redirect('item_detail', id=item.id)
     else:
         form = ItemForm(instance=item)
     return render(request, 'items/edit_item.html', {'form': form, 'item': item})

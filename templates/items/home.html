@@ -2,61 +2,50 @@
 
 {% block content %}
 
-<div class="container mt-5">
-    <h1>Welcome to Find Me!</h1>
-    <p class="lead">Your one-stop solution for finding lost items or reporting found ones.</p>
-    
-    <!-- Other homepage content -->
-
-    <!-- Link to Item List for Advanced Search -->
-    <div class="mt-4">
-        <a href="{% url 'item-list' %}" class="btn btn-info">Explore Advanced Search Options</a>
-    </div>
-</div>
-
-<div class="container mt-5">
-<!--
-     <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
-    <div class="col-md-6 px-0">
-      <h1 class="display-4 fst-italic">Welcome to Find Me</h1>
-      <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and efficiently about what’s most interesting in this post’s contents.</p>
-      <p class="lead mb-0"><a href="#" class="text-white fw-bold">Continue reading...</a></p>
-    </div>
-    -->
-  </div>
-    <!-- Enhanced Search Form -->
-    <main class="container">
-    <div class="row justify-content-center mb-4">
-        <div class="col-md-8">
-            <form method="get" action=".">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Search items, e.g., 'wallet', 'phone'" name="q" value="{{ request.GET.q }}" aria-label="Search items">
+<!-- Hero Section with Search Bar -->
+<section class="hero-section text-center bg-light py-5">
+    <div class="container">
+        <h1 class="display-4">Welcome to Find Me!</h1>
+        <p class="lead">A convenient way to report and search for lost and found items.</p>
+        <div class="search-bar my-4">
+            <form method="get" action="{% url 'item-list' %}">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" placeholder="Search for items, e.g., 'wallet', 'phone'" name="q" aria-label="Search items" value="{{ request.GET.q }}">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-info" type="submit"><i class="fas fa-search"></i> Search</button>
+                        <button class="btn btn-info" type="submit"><i class="fas fa-search"></i> Search</button>
                     </div>
                 </div>
             </form>
         </div>
+        <div class="mt-4">
+            <a href="{% url 'item-list' %}" class="btn btn-outline-info btn-lg">Explore Advanced Search Options</a>
+        </div>
     </div>
-    
-    <!-- Buttons for Lost and Found Items -->
+</section>
+
+<!-- Main Content -->
+<main class="container my-5">
+    <!-- Action Buttons -->
     <div class="text-center mb-5">
-        <a href="{% url 'lost_items' %}" class="btn btn-primary mr-2">Lost Items</a>
-        <a href="{% url 'found_items' %}" class="btn btn-secondary ml-2">Found Items</a>
+        <a href="{% url 'lost_items' %}" class="btn btn-primary me-2">Lost Items</a>
+        <a href="{% url 'found_items' %}" class="btn btn-secondary ms-2">Found Items</a>
     </div>
-    
-    <!-- Cards for Item Listings -->
+
+    <!-- Item Cards Grid -->
     {% if items %}
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for item in items %}
-        <div class="col-sm-12 col-md-4 mb-4">
+        <div class="col">
             <div class="card h-100">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.title }}">
+                {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title"><a href="{% url 'item_detail' item.id %}" class="stretched-link">{{ item.title }}</a></h5>
+                    <h5 class="card-title">{{ item.title }}</h5>
                     <p class="card-text">{{ item.description|truncatewords:20 }}</p>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Category: {{ item.category }}</small>
+                <div class="card-footer text-muted">
+                    Category: {{ item.category.name }}
                 </div>
             </div>
         </div>
@@ -67,10 +56,11 @@
         No items found. Try adjusting your search or check out lost and found items.
     </div>
     {% endif %}
-</div>
+</main>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
 {% endblock %}
+
 
