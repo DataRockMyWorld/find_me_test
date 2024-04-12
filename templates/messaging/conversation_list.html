@@ -7,7 +7,13 @@
         {% for conversation in conversations %}
         <a href="{% url 'conversation_detail' pk=conversation.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Conversation {{ conversation.pk }}</h5>
+                <h5 class="mb-1">Conversation with
+                {% for participant in conversation.participants.all %}
+                {% if participant != request.user %}
+                {{ participant.username }}
+                {% endif %}
+                {% endfor %}
+                </h5>
                 <!-- Example: Show the number of messages or participants -->
                 <small>{{ conversation.messages.count }} messages</small>
             </div>

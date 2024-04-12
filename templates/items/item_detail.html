@@ -1,16 +1,34 @@
 {% extends '../base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{{ item.title }}</h5>
-            <p class="card-text">{{ item.description }}</p>
-            {% if not item.claimant %}
-                <a href="{% url 'claim_create' item.id %}" class="btn btn-info">Claim this Item</a>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <!-- Item Image -->
+            {% if item.image %}
+            <img src="{{ item.image.url }}" class="img-fluid img-thumbnail" alt="{{ item.title }}">
             {% else %}
-                <button class="btn btn-secondary" disabled>Already Claimed</button>
+            <img src="{% static 'media/default-image.jpeg' %}" class="img-fluid img-thumbnail" alt="Default image">
             {% endif %}
+        </div>
+
+        <div class="col-lg-6">
+            <!-- Item Details -->
+            <div class="card border-0">
+                <div class="card-body">
+                    <h1 class="card-title display-4">{{ item.title }}</h1>
+                    <p class="card-text">{{ item.description }}</p>
+                    <p class="card-text"><small class="text-muted">Posted by {{ item.owner.username }} on {{ item.date_posted|date:"N j, Y H:i" }}</small></p>
+
+                    <!-- Claim Button -->
+                    {% if not item.claimant %}
+                    <a href="{% url 'claim_create' item.id %}" class="btn btn-info">Claim this Item</a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>Already Claimed</button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

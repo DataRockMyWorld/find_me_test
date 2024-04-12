@@ -9,13 +9,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.contrib import messages
 from claims.forms import ClaimForm
+from django.conf import settings
+from django.views.decorators.http import require_http_methods
 
 
 
 class ItemListView(LoginRequiredMixin, ListView):
     model = Item
     context_object_name = 'items'
-    template_name = 'items/item_list.html'
+    template_name = 'items/items_list.html'
 
     def get_queryset(self):
         # Start with all items or limit to the user's items based on your needs
@@ -125,6 +127,7 @@ def edit_item(request, item_id):
         form = ItemForm(instance=item)
     return render(request, 'items/edit_item.html', {'form': form, 'item': item})
 
+
 @login_required
 def make_claim(request, item_id):
     item = get_object_or_404(Item, id=item_id)
@@ -144,63 +147,37 @@ def make_claim(request, item_id):
     return redirect('dashboard')
 
 @login_required
+@require_http_methods(["POST"])  # Ensure that these views only accept POST requests.
 def approve_claim(request, claim_id):
     claim = get_object_or_404(Claim, id=claim_id)
     if claim.item.owner != request.user:
         messages.error(request, "You are not authorized to approve this claim.")
-        return redirect('dashboard')  # Replace 'dashboard' with your dashboard view's name
+        return redirect('dashboard')
 
-    claim.status = 'approved'
-    claim.save()
+    if claim.status == 'pending':  # Ensure only pending claims can be approved.
+        claim.status = 'approved'
+        claim.save()
+        messages.success(request, "Claim approved successfully.")
+    else:
+        messages.info(request, "This claim has already been processed.")
 
-    # Send notification
-    Notification.objects.create(
-        recipient=claim.claimant,
-        item=claim.item,
-        type='claim_approved',
-        message=f'Your claim on {claim.item.title} has been approved.'
-    )
-    
-    # Optionally, send an email notification
-    send_mail(
-        'Claim Approved',
-        f'Your claim on {claim.item.title} has been approved by the owner.',
-        'from@example.com',
-        [claim.claimant.email],
-        fail_silently=False,
-    )
-
-    messages.success(request, "Claim approved successfully.")
     return redirect('dashboard')
 
 @login_required
+@require_http_methods(["POST"])
 def reject_claim(request, claim_id):
     claim = get_object_or_404(Claim, id=claim_id)
     if claim.item.owner != request.user:
         messages.error(request, "You are not authorized to reject this claim.")
         return redirect('dashboard')
 
-    claim.status = 'rejected'
-    claim.save()
+    if claim.status == 'pending':  # Ensure only pending claims can be rejected.
+        claim.status = 'rejected'
+        claim.save()
+        messages.success(request, "Claim rejected successfully.")
+    else:
+        messages.info(request, "This claim has already been processed.")
 
-    # Send notification
-    Notification.objects.create(
-        recipient=claim.claimant,
-        item=claim.item,
-        type='claim_rejected',
-        message=f'Your claim on {claim.item.title} has been rejected.'
-    )
-    
-    # Optionally, send an email notification
-    send_mail(
-        'Claim Rejected',
-        f'Your claim on {claim.item.title} has been rejected by the owner.',
-        'from@example.com',
-        [claim.claimant.email],
-        fail_silently=False,
-    )
-
-    messages.success(request, "Claim rejected successfully.")
     return redirect('dashboard')
 
 class ClaimCreateView(LoginRequiredMixin, View):

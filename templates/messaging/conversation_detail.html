@@ -2,18 +2,31 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-3">Conversation {{ conversation.pk }}</h2>
+    <!-- Displaying the name of the conversation partner -->
+    <h2 class="mb-3">Conversation with 
+    {% for participant in conversation.participants.all %}
+        {% if participant != request.user %}
+            {{ participant.username }}
+        {% endif %}
+    {% endfor %}
+    </h2>
     <div class="messages mb-3">
         {% for message in conversation.messages.all %}
         <div class="card mb-2 {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %}">
             <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-muted">{{ message.sender.username }}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">{{ message.sender.username }} - <small>{{ message.timestamp|date:"M d, Y H:i" }}</small></h6>
                 <p class="card-text">{{ message.content }}</p>
-                <p class="card-text"><small>{{ message.timestamp|date:"M d, Y H:i" }}</small></p>
+                <!-- Edit and Delete options -->
+                {% if message.sender == request.user %}
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'edit_message' message.id %}" class="btn btn-outline-secondary btn-sm mx-1">Edit</a>
+                    <a href="{% url 'delete_message' message.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% empty %}
-        <p>No messages.</p>
+        <p class="text-muted">No messages.</p>
         {% endfor %}
     </div>
     <form method="post" action="{% url 'send_message' conversation.pk %}">
@@ -25,4 +38,3 @@
     </form>
 </div>
 {% endblock %}
-

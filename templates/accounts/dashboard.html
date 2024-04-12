@@ -1,12 +1,10 @@
 {% extends '../base.html' %}
 
-
 {% block content %}
 <div class="container-fluid py-5">
     <!-- Dashboard Heading -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Welcome back, {{ user.get_full_name|default:user.username }}!</h1>
-        <!-- User search function placeholder -->
+        <h2>Welcome back, {{ user.get_full_name|default:user.username }}!</h2>
     </div>
 
     <!-- Dashboard Content -->
@@ -35,23 +33,31 @@
             </div>
         </div>
 
-        <!-- Incoming Claims Section -->
-        <div class="col-md-4 mb-4">
+  <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-header bg-warning text-white">
                     <h4>Incoming Claims</h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        {% for claim in user_claims %}
+                        {% for claim in incoming_claims %}
                         <li class="list-group-item">
                             <strong>{{ claim.item.title }}</strong> by <em>{{ claim.claimant.username }}</em>
-                            <div><strong>Claimant:</strong> {{ claim.claimant.username }}</div>
-                            <div><strong>Description:</strong> {{ claim.description }}</div>
-                            <div class="mt-2">
-                                <a href="{% url 'approve_claim' claim.id %}" class="btn btn-success btn-sm">Approve</a>
-                                <a href="{% url 'reject_claim' claim.id %}" class="btn btn-danger btn-sm">Reject</a>
-                                <a href="{% url 'message_user' claim.claimant.id %}" class="btn btn-info btn-sm">Message</a>
+                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <!-- Approve and Reject Forms -->
+                                    <form method="post" action="{% url 'approve_claim' claim.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </form>
+                                    <form method="post" action="{% url 'reject_claim' claim.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </form>
+                                </div>
+                                <a href="{% url 'message_user' claim.claimant.id %}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-envelope"></i> Message
+                                </a>
                             </div>
                         </li>
                         {% empty %}
@@ -63,60 +69,23 @@
         </div>
 
         <!-- Claim History Section -->
-       <div class="col-md-4 mb-4">
-    <div class="card">
-        <div class="card-header bg-secondary text-white">
-            <h4>Claim History</h4>
-        </div>
-        <div class="card-body">
-            {% if claim_history %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Claimant</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for history in claim_history %}
-                    <tr>
-                        <td>{{ history.item.title }}</td>
-                        <td>{{ history.claimant.username }}</td>
-                        <td><strong>{{ history.get_status_display }}</strong></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="list-group-item">No claim history found.</div>
-            {% endif %}
-        </div>
-    </div>
-</div>
-    </div>
-
-    <!-- Messages Section -->
-    <div class="row mt-4">
-        <div class="col-12">
+        <div class="col-md-4 mb-4">
             <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4>Messages</h4>
+                <div class="card-header bg-secondary text-white">
+                    <h4>Claim History</h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush">
-                        {% for message in user_messages %}
+                        {% for history in claim_history %}
                         <li class="list-group-item">
-                            From: <strong>{{ message.sender.username }}</strong>
-                            <p>{{ message.content|truncatechars:100 }}</p>
+                            <strong>{{ history.item.title }}</strong> claimed by <em>{{ history.claimant.username }}</em>
+                            <strong>Status:</strong> {{ history.status|title }}
+                            <span class="text-muted float-right">{{ history.modified_at|date:"M d, Y H:i" }}</span>
                         </li>
                         {% empty %}
-                        <li class="list-group-item">You have no messages yet.</li>
+                        <li class="list-group-item">No claim history found.</li>
                         {% endfor %}
                     </ul>
-                </div>
-                <div class="card-footer text-right">
-                    <a href="{% url 'conversation_list' %}" class="btn btn-light">View all messages</a>
                 </div>
             </div>
         </div>
